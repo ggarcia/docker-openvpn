@@ -14,4 +14,8 @@ WORKDIR /etc/openvpn
 
 ADD run.sh .
 
+VOLUME /etc/openvpn
+
+EXPOSE 1194
+
 CMD ["bash"]
