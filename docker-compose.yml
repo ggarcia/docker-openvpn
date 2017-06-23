@@ -1,0 +1,13 @@
+version: '2'
+
+services:
+
+  openvpn:
+    image: ggarcia/openvpn
+    volumes:
+       - ovpn-data:/etc/openvpn
+    ports:
+      - "1194:1194"
+
+volumes:
+  ovpn-data:
