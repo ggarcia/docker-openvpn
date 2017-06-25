@@ -1,31 +1,16 @@
 #!/bin/sh
 
-DEASY="/etc/openvpn/easy-rsa"
+set -e
 
-if [ ! -d $DEASY ] ; then
-  mkdir -p $DEASY/keys
-  cp -Rv /usr/share/easy-rsa/* $DEASY
-fi
+[ -d /dev/net ] || mkdir -p /dev/net
+[ -c /dev/net/tun ] || mknod /dev/net/tun c 10 200
 
-cat << _EOF_ > $EASY/vars
-export KEY_COUNTRY="US"
-export KEY_PROVINCE="CA"
-export KEY_CITY="SanFrancisco"
-export KEY_ORG="Fort-Funston"
-export KEY_EMAIL="mail@domain"
-export KEY_EMAIL=mail@domain
-_EOF_
+cd /etc/openvpn
 
-cd $DEASY
-touch keys/index.txt
-echo 01 > keys/serial
-. ./vars  # set environment variables
-./clean-all
+[ -d server.conf ] || sh ./server.sh
 
+# iptables -t nat -A POSTROUTING -s 192.168.255.0/24 -o eth0 -j MASQUERADE
 
-./build-ca
-
-./build-key-server server
-
-./build-dh
-
+touch server.log
+while true ; do openvpn server.conf ; done >> server.log &
+tail -F *.log
